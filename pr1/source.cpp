@@ -37,24 +37,31 @@ int main()
     if (coefficientA != 0)
     {
         const float discriminant = calculateDiscriminant(coefficientA, coefficientB, coefficientC);
-        cout << endl << "Discriminant = " << discriminant << "." << endl;
+        cout << endl
+             << "Discriminant = " << discriminant << "." << endl;
 
         if (discriminant < 0)
         {
             cout << "Discriminant < 0. No real roots." << endl;
         }
-        else if (discriminant == 0)
-        {
-            cout << "Discriminant = 0. Equation root x = " 
-                << calculateFirstRoot(discriminant, coefficientA, coefficientB)
-                << "." << endl;
-        }
         else
         {
-            cout << "Equation roots are: x1 = "
-                << calculateFirstRoot(discriminant, coefficientA, coefficientB)
-                << ", x2 = " << calculateSecondRoot(discriminant, coefficientA, coefficientB)
-                << "." << endl;
+            const float firstRoot = calculateFirstRoot(discriminant, coefficientA, coefficientB);
+            const float secondRoot = calculateSecondRoot(discriminant, coefficientA, coefficientB);
+
+            if (firstRoot == secondRoot)
+            {
+                cout << "Equation roots are: x1 = "
+                     << firstRoot
+                     << ", x2 = " << secondRoot
+                     << "." << endl;
+            }
+            else
+            {
+                cout << "Equation root x = "
+                     << firstRoot
+                     << "." << endl;
+            }
         }
     }
     else
