@@ -49,7 +49,7 @@ int main()
             const float firstRoot = calculateFirstRoot(discriminant, coefficientA, coefficientB);
             const float secondRoot = calculateSecondRoot(discriminant, coefficientA, coefficientB);
 
-            if (firstRoot == secondRoot)
+            if (firstRoot != secondRoot)
             {
                 cout << "Equation roots are: x1 = "
                      << firstRoot
