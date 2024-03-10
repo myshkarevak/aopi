@@ -4,26 +4,30 @@
 
 using namespace std;
 
-void merge(vector<int> &array, const int start, const int mid, const int end)
+void split (vector<int> &array, vector<int> &leftArray, vector<int> &rightArray)
 {
-    const int leftArrayLength = mid - start + 1;
-    const int rightArrayLength = end - mid;
+    const int leftArraySize = array.size() / 2;
+    const int rightArraySize = array.size() - leftArraySize;
 
-    int leftArray[leftArrayLength], rightArray[rightArrayLength];
+    leftArray.reserve(leftArraySize);
+    rightArray.reserve(rightArraySize);
 
-    for (int index = 0; index < leftArrayLength; index++)
+    for (int index = 0; index < leftArraySize; index++)
     {
-        leftArray[index] = array[start + index];
+        leftArray.push_back(array[index]);
     }
 
-    for (int index = 0; index < rightArrayLength; index++)
+    for (int index = 0; index < rightArraySize; index++)
     {
-        rightArray[index] = array[mid + 1 + index];
+        rightArray.push_back(array[leftArraySize + index]);
     }
+}
 
-    int leftArrayIndex = 0, rightArrayIndex = 0, mergedArrayIndex = start;
+void merge(vector<int> &array, vector<int> &leftArray, vector<int> &rightArray)
+{
+    int leftArrayIndex = 0, rightArrayIndex = 0, mergedArrayIndex = 0;
 
-    while (leftArrayIndex < leftArrayLength && rightArrayIndex < rightArrayLength)
+    while (leftArrayIndex < leftArray.size() && rightArrayIndex < rightArray.size())
     {
         if (leftArray[leftArrayIndex] <= rightArray[rightArrayIndex])
         {
@@ -38,14 +42,14 @@ void merge(vector<int> &array, const int start, const int mid, const int end)
         mergedArrayIndex++;
     }
 
-    while (leftArrayIndex < leftArrayLength)
+    while (leftArrayIndex < leftArray.size())
     {
         array[mergedArrayIndex] = leftArray[leftArrayIndex];
         leftArrayIndex++;
         mergedArrayIndex++;
     }
 
-    while (rightArrayIndex < rightArrayLength)
+    while (rightArrayIndex < rightArray.size())
     {
         array[mergedArrayIndex] = rightArray[rightArrayIndex];
         rightArrayIndex++;
@@ -53,28 +57,19 @@ void merge(vector<int> &array, const int start, const int mid, const int end)
     }
 }
 
-void mergeSort(vector<int> &array, const int begin, const int end)
+void mergeSort(vector<int> &array)
 {
-
-    if (begin >= end)
+    if (array.size() <= 1)
     {
         return;
     }
 
-    const int mid = begin + (end - begin) / 2;
-    mergeSort(array, begin, mid);
-    mergeSort(array, mid + 1, end);
-    merge(array, begin, mid, end);
-}
+    vector<int> leftArray, rightArray;
 
-void printArray(vector<int> &array, const int size)
-{
-    for (int index = 0; index < size; index++)
-    {
-        cout << array[index] << " ";
-    }
-
-    cout << endl;
+    split(array, leftArray, rightArray);
+    mergeSort(leftArray);
+    mergeSort(rightArray);
+    merge(array, leftArray, rightArray);
 }
 
 vector<int> readArrayFromFile(const string filename)
@@ -111,20 +106,29 @@ vector<int> readArrayFromFile(const string filename)
     return data;
 }
 
+void printArray(vector<int> &array)
+{
+    for (int index = 0; index < array.size(); index++)
+    {
+        cout << array[index] << " ";
+    }
+
+    cout << endl;
+}
+
 int main()
 {
     const string filename = "C:\\data.txt";
     vector<int> array = readArrayFromFile(filename);
-    const int size = array.size();
-    cout << "size " << size << endl;
+    cout << "size " << array.size() << endl;
 
     cout << "Read array is:" << endl;
-    printArray(array, size);
+    printArray(array);
 
-    mergeSort(array, 0, size - 1);
+    mergeSort(array);
 
     cout << "Sorted array is:" << endl;
-    printArray(array, size);
+    printArray(array);
 
     system("pause");
     return 0;
