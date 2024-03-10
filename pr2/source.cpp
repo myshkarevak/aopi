@@ -70,6 +70,9 @@ void mergeSort(vector<int> &array)
     mergeSort(leftArray);
     mergeSort(rightArray);
     merge(array, leftArray, rightArray);
+
+    leftArray.clear();
+    rightArray.clear();
 }
 
 vector<int> readArrayFromFile(const string filename)
@@ -120,7 +123,7 @@ int main()
 {
     const string filename = "C:\\data.txt";
     vector<int> array = readArrayFromFile(filename);
-    cout << "size " << array.size() << endl;
+    cout << "Size " << array.size() << endl;
 
     cout << "Read array is:" << endl;
     printArray(array);
@@ -129,6 +132,8 @@ int main()
 
     cout << "Sorted array is:" << endl;
     printArray(array);
+
+    array.clear();
 
     system("pause");
     return 0;
