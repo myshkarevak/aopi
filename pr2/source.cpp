@@ -1,8 +1,115 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
-
 using namespace std;
+
+template <typename T>
+class QueueNode 
+{
+    private:
+    T value;
+    QueueNode* nextNode;
+
+    public:
+    QueueNode(T value)
+    {
+        this->value = value;
+        this->nextNode = NULL;
+    }
+
+    void setValue(T value)
+    {
+        this->value = value;
+    }
+
+    T getValue()
+    {
+        return this->value;
+    }
+
+    void setNextNode(QueueNode* nextNode)
+    {
+        this->nextNode = nextNode;
+    }
+
+    QueueNode* getNextNode()
+    {
+        return this->nextNode;
+    }
+}
+
+class CircularQueue 
+{
+    private:
+    QueueNode head;
+    QueueNode tail;
+    int size;
+
+    public:
+    CircularQueue() 
+    {
+        this->head = NULL;
+        this->tail = NULL;
+        this->size = 0;
+    }
+
+    ~CircularQueue()
+    {
+        while(!this->isEmpty())
+        {
+            this->dequeue();
+        }
+    }
+
+    int getSize()
+    {
+        return this->size;
+    }
+
+    bool isEmpty()
+    {
+        return this
+    }
+
+    QueueNode* getHead()
+    {
+        return this->head;
+    }
+
+    void enqueue(T value) {
+        QueueNode* newNode = new Node(value);
+        if (this->isEmpty()) {
+            newNode->setNextNode(newNode);
+            this->head = newNode;
+            this->tail = newNode;
+        } else {
+            newNode->setNextNode(this->head);
+            this->tail->setNextNode(newNode);
+            this->tail = newNode;
+        }
+        this->size++;
+    }
+
+    T dequeue() {
+        if (isEmpty()) {
+            throw runtime_error("Queue is empty");
+        }
+
+        T value = this->head->getValue();
+
+        if (this->head == this->tail) {
+            this->head = NULL;
+            this->tail = NULL;
+        } else {
+            this->head = this->head->getNextNode();
+            this->tail->setNextNode(this->head);
+        }
+
+        this->size--;
+
+        return value;
+    }
+}
 
 void split (vector<int> &array, vector<int> &leftArray, vector<int> &rightArray)
 {
