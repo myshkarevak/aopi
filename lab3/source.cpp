@@ -78,13 +78,17 @@ class CircularQueue
         return this->head;
     }
 
-    void enqueue(T value) {
+    void enqueue(T value)
+    {
         QueueNode<T>* newNode = new QueueNode<T>(value);
-        if (this->isEmpty()) {
+        if (this->isEmpty())
+        {
             newNode->setNextNode(newNode);
             this->head = newNode;
             this->tail = newNode;
-        } else {
+        }
+        else
+        {
             newNode->setNextNode(this->head);
             this->tail->setNextNode(newNode);
             this->tail = newNode;
@@ -92,17 +96,22 @@ class CircularQueue
         this->size++;
     }
 
-    T dequeue() {
-        if (isEmpty()) {
+    T dequeue()
+    {
+        if (isEmpty())
+        {
             throw runtime_error("Queue is empty");
         }
 
         T value = this->head->getValue();
 
-        if (this->head == this->tail) {
+        if (this->head == this->tail)
+        {
             this->head = nullptr;
             this->tail = nullptr;
-        } else {
+        }
+        else
+        {
             this->head = this->head->getNextNode();
             this->tail->setNextNode(this->head);
         }
