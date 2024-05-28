@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+
 using namespace std;
 
 template <typename T>
@@ -14,7 +15,7 @@ class QueueNode
     QueueNode(T value)
     {
         this->value = value;
-        this->nextNode = NULL;
+        this->nextNode = nullptr;
     }
 
     void setValue(T value)
@@ -27,29 +28,30 @@ class QueueNode
         return this->value;
     }
 
-    void setNextNode(QueueNode* nextNode)
+    void setNextNode(QueueNode<T>* nextNode)
     {
         this->nextNode = nextNode;
     }
 
-    QueueNode* getNextNode()
+    QueueNode<T>* getNextNode()
     {
         return this->nextNode;
     }
-}
+};
 
+template <typename T>
 class CircularQueue 
 {
     private:
-    QueueNode head;
-    QueueNode tail;
+    QueueNode<T>* head;
+    QueueNode<T>* tail;
     int size;
 
     public:
     CircularQueue() 
     {
-        this->head = NULL;
-        this->tail = NULL;
+        this->head = nullptr;
+        this->tail = nullptr;
         this->size = 0;
     }
 
@@ -68,16 +70,16 @@ class CircularQueue
 
     bool isEmpty()
     {
-        return this
+        return this->size == 0;
     }
 
-    QueueNode* getHead()
+    QueueNode<T>* getHead()
     {
         return this->head;
     }
 
     void enqueue(T value) {
-        QueueNode* newNode = new Node(value);
+        QueueNode<T>* newNode = new QueueNode<T>(value);
         if (this->isEmpty()) {
             newNode->setNextNode(newNode);
             this->head = newNode;
@@ -98,8 +100,8 @@ class CircularQueue
         T value = this->head->getValue();
 
         if (this->head == this->tail) {
-            this->head = NULL;
-            this->tail = NULL;
+            this->head = nullptr;
+            this->tail = nullptr;
         } else {
             this->head = this->head->getNextNode();
             this->tail->setNextNode(this->head);
@@ -109,80 +111,67 @@ class CircularQueue
 
         return value;
     }
-}
+};
 
-void split (vector<int> &array, vector<int> &leftArray, vector<int> &rightArray)
+void split (CircularQueue<int> &queue, CircularQueue<int> &leftQueue, CircularQueue<int> &rightQueue)
 {
-    const int leftArraySize = array.size() / 2;
-    const int rightArraySize = array.size() - leftArraySize;
-
-    leftArray.reserve(leftArraySize);
-    rightArray.reserve(rightArraySize);
-
-    for (int index = 0; index < leftArraySize; index++)
+    for (int index = 0; index < queue.getSize() / 2; index++)
     {
-        leftArray.push_back(array[index]);
+        leftQueue.enqueue(queue.dequeue());
     }
 
-    for (int index = 0; index < rightArraySize; index++)
+    while (!queue.isEmpty())
     {
-        rightArray.push_back(array[leftArraySize + index]);
+        rightQueue.enqueue(queue.dequeue());
     }
 }
 
-void merge(vector<int> &array, vector<int> &leftArray, vector<int> &rightArray)
+void merge(CircularQueue<int> &queue, CircularQueue<int> &leftQueue, CircularQueue<int> &rightQueue)
 {
-    int leftArrayIndex = 0, rightArrayIndex = 0, mergedArrayIndex = 0;
+    QueueNode<int>* currentLeftQueueNode = leftQueue.getHead();
+    QueueNode<int>* currentRightQueueNode = rightQueue.getHead();
 
-    while (leftArrayIndex < leftArray.size() && rightArrayIndex < rightArray.size())
+    while (!leftQueue.isEmpty() && !rightQueue.isEmpty())
     {
-        if (leftArray[leftArrayIndex] <= rightArray[rightArrayIndex])
+        if (currentLeftQueueNode->getValue() <= currentRightQueueNode->getValue())
         {
-            array[mergedArrayIndex] = leftArray[leftArrayIndex];
-            leftArrayIndex++;
+            currentLeftQueueNode = currentLeftQueueNode->getNextNode();
+            queue.enqueue(leftQueue.dequeue());
         }
         else
         {
-            array[mergedArrayIndex] = rightArray[rightArrayIndex];
-            rightArrayIndex++;
+            currentRightQueueNode = currentRightQueueNode->getNextNode();
+            queue.enqueue(rightQueue.dequeue());
         }
-        mergedArrayIndex++;
     }
 
-    while (leftArrayIndex < leftArray.size())
+    while (!leftQueue.isEmpty())
     {
-        array[mergedArrayIndex] = leftArray[leftArrayIndex];
-        leftArrayIndex++;
-        mergedArrayIndex++;
+        queue.enqueue(leftQueue.dequeue());
     }
 
-    while (rightArrayIndex < rightArray.size())
+    while (!rightQueue.isEmpty())
     {
-        array[mergedArrayIndex] = rightArray[rightArrayIndex];
-        rightArrayIndex++;
-        mergedArrayIndex++;
+        queue.enqueue(rightQueue.dequeue());
     }
 }
 
-void mergeSort(vector<int> &array)
+void mergeSort(CircularQueue<int> &queue)
 {
-    if (array.size() <= 1)
+    if (queue.getSize() <= 1)
     {
         return;
     }
 
-    vector<int> leftArray, rightArray;
+    CircularQueue<int> leftQueue, rightQueue;
 
-    split(array, leftArray, rightArray);
-    mergeSort(leftArray);
-    mergeSort(rightArray);
-    merge(array, leftArray, rightArray);
-
-    leftArray.clear();
-    rightArray.clear();
+    split(queue, leftQueue, rightQueue);
+    mergeSort(leftQueue);
+    mergeSort(rightQueue);
+    merge(queue, leftQueue, rightQueue);
 }
 
-vector<int> readArrayFromFile(const string filename)
+CircularQueue<int> readQueueFromFile(const string filename)
 {
     ifstream file;
     file.open(filename, ios::in);
@@ -194,7 +183,7 @@ vector<int> readArrayFromFile(const string filename)
         exit(1);
     }
 
-    vector<int> data;
+    CircularQueue<int> data;
     int buffer;
 
     while (!file.eof())
@@ -207,7 +196,7 @@ vector<int> readArrayFromFile(const string filename)
             exit(1);
         }
         file >> buffer;
-        data.push_back(buffer);
+        data.enqueue(buffer);
     }
     
     file.close();
@@ -216,11 +205,14 @@ vector<int> readArrayFromFile(const string filename)
     return data;
 }
 
-void printArray(vector<int> &array)
+void printQueue(CircularQueue<int> &queue)
 {
-    for (int index = 0; index < array.size(); index++)
+    QueueNode<int>* currentElement = queue.getHead();
+
+    for (int index = 0; index < queue.getSize(); index++)
     {
-        cout << array[index] << " ";
+       cout << currentElement->getValue() << " ";
+       currentElement = currentElement->getNextNode();
     }
 
     cout << endl;
@@ -229,19 +221,18 @@ void printArray(vector<int> &array)
 int main()
 {
     const string filename = "C:\\data.txt";
-    vector<int> array = readArrayFromFile(filename);
-    cout << "Size " << array.size() << endl;
+    CircularQueue<int> queue = readQueueFromFile(filename);
+    cout << "Size " << queue.getSize() << endl;
 
-    cout << "Read array is:" << endl;
-    printArray(array);
+    cout << "Read data is:" << endl;
+    printQueue(queue);
 
-    mergeSort(array);
+    mergeSort(queue);
 
-    cout << "Sorted array is:" << endl;
-    printArray(array);
-
-    array.clear();
+    cout << "Sorted data is:" << endl;
+    printQueue(queue);
 
     system("pause");
+
     return 0;
 }
