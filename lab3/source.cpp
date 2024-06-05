@@ -120,7 +120,8 @@ class CircularQueue
     }
 };
 
-void split (CircularQueue<int> &queue, CircularQueue<int> &leftQueue, CircularQueue<int> &rightQueue)
+template <typename T>
+void split (CircularQueue<T> &queue, CircularQueue<T> &leftQueue, CircularQueue<T> &rightQueue)
 {
     for (int index = 0; index < queue.getSize() / 2; index++)
     {
@@ -133,10 +134,11 @@ void split (CircularQueue<int> &queue, CircularQueue<int> &leftQueue, CircularQu
     }
 }
 
-void merge(CircularQueue<int> &queue, CircularQueue<int> &leftQueue, CircularQueue<int> &rightQueue)
+template <typename T>
+void merge(CircularQueue<T> &queue, CircularQueue<T> &leftQueue, CircularQueue<T> &rightQueue)
 {
-    QueueNode<int>* currentLeftQueueNode = leftQueue.getHead();
-    QueueNode<int>* currentRightQueueNode = rightQueue.getHead();
+    QueueNode<T>* currentLeftQueueNode = leftQueue.getHead();
+    QueueNode<T>* currentRightQueueNode = rightQueue.getHead();
 
     while (!leftQueue.isEmpty() && !rightQueue.isEmpty())
     {
@@ -163,14 +165,15 @@ void merge(CircularQueue<int> &queue, CircularQueue<int> &leftQueue, CircularQue
     }
 }
 
-void mergeSort(CircularQueue<int> &queue)
+template <typename T>
+void mergeSort(CircularQueue<T> &queue)
 {
     if (queue.getSize() <= 1)
     {
         return;
     }
 
-    CircularQueue<int> leftQueue, rightQueue;
+    CircularQueue<T> leftQueue, rightQueue;
 
     split(queue, leftQueue, rightQueue);
     mergeSort(leftQueue);
@@ -178,7 +181,8 @@ void mergeSort(CircularQueue<int> &queue)
     merge(queue, leftQueue, rightQueue);
 }
 
-CircularQueue<int> readQueueFromFile(const string filename)
+template <typename T>
+CircularQueue<T> readQueueFromFile(const string filename)
 {
     ifstream file;
     file.open(filename, ios::in);
@@ -190,8 +194,8 @@ CircularQueue<int> readQueueFromFile(const string filename)
         exit(1);
     }
 
-    CircularQueue<int> data;
-    int buffer;
+    CircularQueue<T> data;
+    T buffer;
 
     while (!file.eof())
     {
@@ -212,9 +216,10 @@ CircularQueue<int> readQueueFromFile(const string filename)
     return data;
 }
 
-void printQueue(CircularQueue<int> &queue)
+template <typename T>
+void printQueue(CircularQueue<T> &queue)
 {
-    QueueNode<int>* currentElement = queue.getHead();
+    QueueNode<T>* currentElement = queue.getHead();
 
     for (int index = 0; index < queue.getSize(); index++)
     {
@@ -227,18 +232,16 @@ void printQueue(CircularQueue<int> &queue)
 
 int main()
 {
-    const string filename = "C:\\data.txt";
-    CircularQueue<int> queue = readQueueFromFile(filename);
-    cout << "Size " << queue.getSize() << endl;
+    CircularQueue<int> queue = readQueueFromFile<int>("C:\\data.txt");
 
-    cout << "Read data is:" << endl;
+    cout << "Size " << queue.getSize() << endl << "Read data is:" << endl;
+
     printQueue(queue);
-
     mergeSort(queue);
 
     cout << "Sorted data is:" << endl;
-    printQueue(queue);
 
+    printQueue(queue);
     system("pause");
 
     return 0;
